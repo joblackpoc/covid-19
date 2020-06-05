@@ -9,5 +9,9 @@ urlpatterns = [
     path('icons/', Icons, name='icons-page'),
     path('tables/', Tables, name='tables-page'),
     path('user/', User, name='user-page'),
-    path('typography/', Typography, name='typography-page')
+    path('typography/', Typography, name='typography-page'),
+    path('notifications/', Notifications, name='notifications-page'),
+    path('upgrade/', Upgrade, name='upgrade-page'),
+    path('maps/', Maps, name='maps-page'),
+    
 ]

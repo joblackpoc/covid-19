@@ -17,3 +17,12 @@ def User(request):
 
 def Typography(request):
     return render(request, 'covid/typography.html')
+
+def Notifications(request):
+    return render(request, 'covid/notifications.html')
+
+def Upgrade(request):
+    return  render(request, 'covid/upgrade.html')
+
+def Maps(request):
+    return render(request, 'covid/maps.html')
