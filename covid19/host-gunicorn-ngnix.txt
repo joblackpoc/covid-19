@@ -1,0 +1,124 @@
+1. lsb_release -a; getconf LONG_BIT ; hostname -I ; hostname
+
+2. apt install python3-pip python3-dev libpq-dev mysql-server libmysqlclient-dev nginx curl python3-widgetsnbextension python3-testresources build-essential dpkg-dev net-tools git nano gedit cmake curl wget dpkg-dev gdebi aptitude apt-transport-https ca-certificates curl software-properties-common -y
+
+3. mysql_secure_installation
+
+4. mysql -u root -p 
+    4.1 CREATE DATABASE myproject CHARACTER SET UTF8;
+        CREATE USER myprojectuser@localhost IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON myproject.* TO myprojectuser@localhost;
+        FLUSH PRIVILEGES;
+        exit
+
+5. sudo -H pip3 install --upgrade pip
+
+6. sudo -H pip3 install virtualenv
+
+7. mkdir ~/myprojectdir ; 
+    cd ~/myprojectdir;
+
+8. virtualenv myprojectenv
+
+9. source myprojectenv/bin/activate
+
+10. pip install django gunicorn mysqlclient
+
+11. django-admin.py startproject myproject ~/myprojectdir
+
+12. gedit ~/myprojectdir/myproject/settings.py &>/dev/null
+    12.1 ALLOWED_HOSTS = ['127.0.0.1']
+    12.2 DATABASE = {
+        'default':{
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'myproject',
+            'USER': 'myprojectuser',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
+    12.3 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+13. ~/myprojectdir/manage.py check
+
+14. ~/myprojectdir/manage.py makemigrations
+
+15. ~/myprojectdir/manage.py migrate
+
+16. ~/myprojectdir/manage.py createsuperuser
+    16.1 User: root
+    16.2 Pass: Strongpassword
+
+17. ~/myprojectdir/manage.py collectstatic
+
+18. ~/myprojectdir/manage.py runserver 127.0.0.1:8000
+    18.1 http://127.0.0.1:8000
+    18.2 http://127.0.0.1:8000/admin
+    18.3 test
+    18.4 Ctrl+C
+
+19. cd ~/myprojectdir
+
+20. gunicorn --bind 127.0.0.1:8000 myproject.wsgi
+    20.1 http://127.0.0.1:8000
+
+21. deactivate
+
+22. gedit /etc/systemd/system/gunicorn.socket &>/dev/null
+    22.1 [Unit]
+        Description=gunicorn socket 
+
+        [Socket]
+        ListeenStream=/run/gunicorn.sock
+
+        [Install]
+        WantedBy=sockets.target
+
+23. gedit /etc/systemd/system/gunicorn.service &>/dev/null
+    23.1 [Unit]
+        Description=gunicorn daemon
+        Requires=gunicorn.socket 
+        After=network.target
+
+        [Service]
+        User=root
+        Group=www-data 
+        WorkingDirectory=/root/myprojectdir
+        ExecStart=/root/myprojectdir/myprojectenv/bin/gunicorn \
+                    --access-logfile - \
+                    --workers 3 \
+                    --bind unix:/run/gunicorn.sock \
+                    myproject.wsgi:application
+
+        [Install]
+        WantedBy=multi-user.target
+
+24. systemctl daemon-reload ; systemctl start gunicorn.socket ; systemctl enable gunicorn.socket
+
+25. gedit /etc/nginx/sites-available/myproject &>/dev/null
+    25.1 
+    server {
+        listen 80;
+        server_name 127.0.0.1;
+
+        location = favicon.ico {access_log off; log_not_found off;}
+        location /static/ {
+            root /root/myprojectdir;
+        }
+
+        location / {
+            include proxy_param;
+            proxy_pass http://unix:/run/gunicorn.sock; 
+        }
+    }
+
+26. ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled
+
+27. nginx -t 
+
+28. systemctl daemon-reload
+
+29. systemctl restart gunicorn.socket gunicorn.service nginx.service ; systemctl status gunicorn.socket gunicorn.service nginx.service
+
+30. http://127.0.0.1  "success Finish!"
