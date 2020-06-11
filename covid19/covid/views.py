@@ -26,3 +26,6 @@ def Upgrade(request):
 
 def Maps(request):
     return render(request, 'covid/maps.html')
+
+def Rtl(request):
+    return render(request, 'covid/rtl.html')

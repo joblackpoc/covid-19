@@ -13,5 +13,6 @@ urlpatterns = [
     path('notifications/', Notifications, name='notifications-page'),
     path('upgrade/', Upgrade, name='upgrade-page'),
     path('maps/', Maps, name='maps-page'),
+    path('rtl/', Rtl, name='rtl-page'),
     
 ]
