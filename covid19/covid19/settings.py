@@ -78,10 +78,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'covid19',
-        'HOST': '172.16.30.102',
+        'HOST': '***.***.***.***',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'P@ssw0rdhdc++',
+        'PASSWORD': '***********',
     }
 }
 
